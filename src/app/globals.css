@@ -41,3 +41,7 @@ body {
 	font-weight: bold; 
 	color: grey; 
 } 
+
+.chip.highlighted {
+  box-shadow: 0 0 0 2px rgba(40, 111, 225, 0.5);
+}

@@ -6,6 +6,7 @@ import './globals.css';
 interface Chip {
   id: number;
   label: string;
+  highlighted?: boolean;
 }
 
 interface Suggestion {
@@ -42,20 +43,6 @@ const ChipComponent: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const handleBackspace = (e: KeyboardEvent) => {
-      if (e.key === 'Backspace' && input === '') {
-        const lastChip = chips[chips.length - 1];
-        setChips(chips.filter(chip => chip.id !== lastChip.id));
-      }
-    };
-
-    document.addEventListener('keydown', handleBackspace);
-    return () => {
-      document.removeEventListener('keydown', handleBackspace);
-    };
-  }, [input, chips]);
-
   const fetchSuggestions = (query: string) => {
     // Simulate an API call to fetch suggestions based on the query
     const filteredSuggestions = dummyData.filter(
@@ -86,71 +73,100 @@ const ChipComponent: React.FC = () => {
   const handleChipDelete = (chip: Chip) => {
     setChips(chips.filter(c => c.id !== chip.id));
   };
+  const handleChipClick = (chip: Chip) => {
+    // Add a class to highlight the selected chip
+    setChips(chips.map(c => ({ ...c, highlighted: c.id === chip.id })));
+  };
+
+
+
+  useEffect(() => {
+    const handleBackspace = (e: KeyboardEvent) => {
+      if (e.key === 'Backspace' && input === '') {
+        const highlightedChip = chips.find(chip => chip.highlighted);
+        if (highlightedChip) {
+          // If a chip is highlighted, remove it
+          setChips(chips.filter(chip => chip.id !== highlightedChip.id));
+        } else {
+          // If no chip is highlighted, highlight the last chip
+          const lastChip = chips[chips.length - 1];
+          if (lastChip) {
+            handleChipClick(lastChip);
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleBackspace);
+    return () => {
+      document.removeEventListener('keydown', handleBackspace);
+    };
+  }, [input, chips]);
 
   return (
-   
-      <div className="flex flex-col items-center mt-4">
-        <h1 className="text-2xl font-bold font-serif mb-4 text-blue-700">Pick Users</h1>
-        <div className="relative w-full  sm:max-w-20 md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
-          <div className="flex flex-wrap">
-            {chips.map(chip => (
-              <div key={chip.id} className="m-2 chip">
-                <Image
-                  src={chip.avatarUrl}
-                  alt={chip.label}
-                  width={300}
-                  height={300}
-                  className="chip-avatar rounded-full"
-                />
-                {chip.label}
-                <button onClick={() => handleChipDelete(chip)} className="close-icon">
-                  X
-                </button>
-              </div>
-            ))}
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={handleInputChange}
-              className="flex-1   outline-none  rounded p-2"
-              placeholder="Type something..."
-            />
-             <hr className="my-4 border-t-4 border-blue-700  w-full sm:max-w-20 md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto " />
+    <div className="flex flex-col items-center mt-4">
+      <h1 className="text-2xl font-bold font-serif mb-4 text-blue-700">Pick Users</h1>
+      <div className="relative w-full  sm:max-w-20 md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
+        <div className="flex flex-wrap">
+          {chips.map(chip => (
+            <div
+              key={chip.id}
+              className={`m-2 chip ${chip.highlighted ? 'highlighted' : ''}`}
+              onClick={() => handleChipClick(chip)}
+            >
+              <Image
+                src={chip.avatarUrl}
+                alt={chip.label}
+                width={300}
+                height={300}
+                className="chip-avatar rounded-full"
+              />
+              {chip.label}
+              <button onClick={() => handleChipDelete(chip)} className="close-icon">
+                X
+              </button>
+            </div>
+          ))}
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={handleInputChange}
+            className="flex-1   outline-none  rounded p-2"
+            placeholder="Type something..."
+          />
+          <hr className="my-4 border-t-4 border-blue-700  w-full sm:max-w-20 md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto " />
 
-            {input !== '' && suggestions.length > 0 && (
-              <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-b-lg mt-1">
-                {suggestions.map(suggestion => (
-                  <div
-                    key={suggestion.email}
-                    className="px-2 py-2 cursor-pointer hover:bg-gray-200 flex items-center justify-between"
-                    onClick={() => handleItemClick(suggestion)}
-                  >
-                    {suggestion.avatarUrl && (
-                      <Image
-                        src={suggestion.avatarUrl}
-                        alt={suggestion.name}
-                        width={300}
-                        height={300}
-                        className="chip-avatar inline-block mr-2 rounded-full"
-                      />
-                    )}
-                    <div className="flex-1">
-                      <div>
-                        <span className="font-bold">{suggestion.name}</span>
-                        <span className="text-gray-600 ml-2">{suggestion.email}</span>
-                      </div>
+          {input !== '' && suggestions.length > 0 && (
+            <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-b-lg mt-1">
+              {suggestions.map(suggestion => (
+                <div
+                  key={suggestion.email}
+                  className="px-2 py-2 cursor-pointer hover:bg-gray-200 flex items-center justify-between"
+                  onClick={() => handleItemClick(suggestion)}
+                >
+                  <Image
+                    src={suggestion.avatarUrl}
+                    alt={suggestion.name}
+                    width={300}
+                    height={300}
+                    className="chip-avatar inline-block mr-2 rounded-full"
+                  />
+                  <div className="flex-1">
+                    <div>
+                      <span className="font-bold">{suggestion.name}</span>
+                      <span className="text-gray-600 ml-2">{suggestion.email}</span>
                     </div>
                   </div>
-                ))}
-              </div>
-              
-            )}
-            <div></div>
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <div></div>
         </div>
       </div>
-    );
-  };
-  
-  export default ChipComponent;
+    </div>
+  );
+};
+
+export default ChipComponent;
