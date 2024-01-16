@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import Image from 'next/image';
 import './globals.css';
 
 interface Chip {
@@ -94,9 +95,11 @@ const ChipComponent: React.FC = () => {
           <div className="flex flex-wrap">
             {chips.map(chip => (
               <div key={chip.id} className="m-2 chip">
-                <img
+                <Image
                   src={chip.avatarUrl}
                   alt={chip.label}
+                  width={300}
+                  height={300}
                   className="chip-avatar rounded-full"
                 />
                 {chip.label}
@@ -124,9 +127,11 @@ const ChipComponent: React.FC = () => {
                     onClick={() => handleItemClick(suggestion)}
                   >
                     {suggestion.avatarUrl && (
-                      <img
+                      <Image
                         src={suggestion.avatarUrl}
                         alt={suggestion.name}
+                        width={300}
+                        height={300}
                         className="chip-avatar inline-block mr-2 rounded-full"
                       />
                     )}
