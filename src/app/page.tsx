@@ -91,7 +91,7 @@ const ChipComponent: React.FC = () => {
    
       <div className="flex flex-col items-center mt-4">
         <h1 className="text-2xl font-bold font-serif mb-4 text-blue-700">Pick Users</h1>
-        <div className="relative w-full max-w-5xl">
+        <div className="relative w-full  sm:max-w-20 md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto">
           <div className="flex flex-wrap">
             {chips.map(chip => (
               <div key={chip.id} className="m-2 chip">
@@ -116,7 +116,7 @@ const ChipComponent: React.FC = () => {
               className="flex-1   outline-none  rounded p-2"
               placeholder="Type something..."
             />
-             <hr className="my-4 border-t-4 border-blue-700 w-full max-w-5xl" />
+             <hr className="my-4 border-t-4 border-blue-700  w-full sm:max-w-20 md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto " />
 
             {input !== '' && suggestions.length > 0 && (
               <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-b-lg mt-1">
